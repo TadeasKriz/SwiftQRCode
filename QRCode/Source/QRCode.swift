@@ -21,6 +21,8 @@ public class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     var currentDetectedCount: Int = 0
     /// auto remove sub layers when detection completed
     var autoRemoveSubLayers: Bool
+    /// auto clear draw layer when starting the scan
+    var autoClearDrawLayer: Bool
     /// completion call back
     var completedCallBack: ((stringValue: String) -> ())?
     /// the scan rect, default is the bounds of the scan view, can modify it if need
@@ -34,6 +36,7 @@ public class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         self.strokeColor = UIColor.greenColor()
         self.maxDetectedCount = 20
         self.autoRemoveSubLayers = false
+        self.autoClearDrawLayer = true
         
         super.init()
     }
@@ -46,12 +49,13 @@ public class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     ///  - parameter maxDetectedCount:    max detecte count, default is 20
     ///
     ///  - returns: the scanner object
-    public init(autoRemoveSubLayers: Bool, lineWidth: CGFloat = 4, strokeColor: UIColor = UIColor.greenColor(), maxDetectedCount: Int = 20) {
+    public init(autoRemoveSubLayers: Bool, autoClearDrawLayer: Bool = true, lineWidth: CGFloat = 4, strokeColor: UIColor = UIColor.greenColor(), maxDetectedCount: Int = 20) {
         
         self.lineWidth = lineWidth
         self.strokeColor = strokeColor
         self.maxDetectedCount = maxDetectedCount
         self.autoRemoveSubLayers = autoRemoveSubLayers
+        self.autoClearDrawLayer = autoClearDrawLayer
     }
     
     deinit {
@@ -153,6 +157,9 @@ public class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
             
             return
         }
+        if autoClearDrawLayer {
+            clearDrawLayer()
+        }
         session.startRunning()
     }
     
@@ -228,7 +235,7 @@ public class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         drawLayer.removeFromSuperlayer()
     }
     
-    func clearDrawLayer() {
+    public func clearDrawLayer() {
         if drawLayer.sublayers == nil {
             return
         }
